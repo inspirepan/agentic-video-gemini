@@ -1,0 +1,340 @@
+/* Cherry-picked from image-playground's utilities.css / components.css. The
+   token names come from theme.css; nothing here declares a colour of its own. */
+
+@layer components {
+  .mono {
+    font-family: var(--font-mono);
+    font-feature-settings: var(--font-mono--font-feature-settings);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+    font-variation-settings: var(--font-display--font-variation-settings);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  .font-brand {
+    font-family: var(--font-brand);
+    font-weight: var(--font-brand-weight);
+    font-style: var(--font-brand-style);
+    letter-spacing: -0.03em;
+  }
+
+  /* Caption tier — 11px, one tone below body. Never uppercase. */
+  .label {
+    font-size: var(--text-2xs);
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    line-height: 1.45;
+    color: var(--color-text-3);
+  }
+
+  .meta-dot {
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    flex-shrink: 0;
+    align-self: center;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.58;
+    vertical-align: middle;
+  }
+
+  .ui-tooltip {
+    transform-origin: var(--radix-tooltip-content-transform-origin);
+    animation: tooltip-in var(--tt-in-dur) var(--ease-out);
+  }
+  @keyframes tooltip-in {
+    from {
+      opacity: 0;
+      transform: scale(var(--tt-scale));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ui-tooltip {
+      animation: none;
+    }
+  }
+}
+
+@layer utilities {
+  .tap-target,
+  .tap-target-md {
+    isolation: isolate;
+  }
+  .tap-target:not(.absolute):not(.fixed):not(.sticky),
+  .tap-target-md:not(.absolute):not(.fixed):not(.sticky) {
+    position: relative;
+  }
+  .tap-target::before,
+  .tap-target-md::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    z-index: -1;
+  }
+  .tap-target-md::before {
+    inset: -6px;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -400px 0;
+    }
+    100% {
+      background-position: 400px 0;
+    }
+  }
+  .skeleton-animated {
+    background: linear-gradient(
+      90deg,
+      var(--color-surface-2) 0%,
+      var(--color-surface-3) 50%,
+      var(--color-surface-2) 100%
+    );
+    background-size: 800px 100%;
+    animation: shimmer var(--shimmer-dur) var(--ease-linear) infinite;
+  }
+
+  /* Running state for tool rows: the label itself carries a slow sheen. No
+     spinner, no check mark — the sheen's absence is the done state. */
+  @keyframes agent-thinking-shimmer {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 240px 0;
+    }
+  }
+  .agent-thinking-shimmer {
+    color: var(--color-text-4);
+    background-image: linear-gradient(
+      90deg,
+      var(--color-text-4) 0,
+      var(--color-text-4) 88px,
+      var(--color-text-2) 120px,
+      var(--color-text-4) 152px,
+      var(--color-text-4) 240px
+    );
+    background-repeat: repeat-x;
+    background-size: 240px 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: agent-thinking-shimmer var(--shimmer-dur) var(--ease-linear) infinite;
+  }
+
+  /* Interruptible grid-rows collapse (220ms open / 160ms close). */
+  .collapsible-animated {
+    display: grid;
+    grid-template-rows: minmax(0, 0fr);
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      grid-template-rows var(--acc-collapse) var(--acc-ease),
+      visibility 0s linear var(--acc-collapse);
+  }
+  .collapsible-animated > * {
+    min-height: 0;
+    min-width: 0;
+  }
+  .collapsible-animated[data-state='open'] {
+    grid-template-rows: minmax(0, 1fr);
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      grid-template-rows var(--acc-expand) var(--acc-ease),
+      visibility 0s linear 0s;
+  }
+  .collapsible-animated[data-state='closed'] {
+    grid-template-rows: minmax(0, 0fr);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      grid-template-rows var(--acc-collapse) var(--acc-ease),
+      visibility 0s linear var(--acc-collapse);
+  }
+
+  /* Small upward settle for items entering the transcript. */
+  .chat-item-enter {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+  @starting-style {
+    .chat-item-enter {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes matrix-loader-pulse {
+    0%,
+    66%,
+    100% {
+      opacity: 0.28;
+    }
+    22% {
+      opacity: 1;
+    }
+  }
+  .matrix-loader {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    flex: 0 0 auto;
+    gap: var(--matrix-gap, 2px);
+  }
+  .matrix-loader-dot {
+    display: block;
+    min-width: 0;
+    min-height: 0;
+    border-radius: 50%;
+    background-color: currentColor;
+    animation: matrix-loader-pulse var(--matrix-cycle) var(--matrix-ease) infinite;
+    animation-delay: calc(var(--matrix-cycle) * var(--matrix-column, 0) / 10);
+  }
+  .matrix-loader-dot-gap {
+    visibility: hidden;
+    animation: none;
+  }
+  .agent-running-slot {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    color: var(--color-text-2);
+  }
+
+  /* Header lift once content scrolls under it: downward-only, not a ring. */
+  .scroll-edge-shadow {
+    box-shadow:
+      0 1px 1px -1px color-mix(in srgb, black 6%, transparent),
+      0 2px 4px -2px color-mix(in srgb, black 9%, transparent);
+  }
+  .dark .scroll-edge-shadow {
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 6%, transparent),
+      0 2px 6px -2px color-mix(in srgb, black 55%, transparent);
+  }
+
+  /* Dims (does not dissolve) content at a scroller's edges. */
+  .scroll-soft-y {
+    --scroll-soft-size: 8px;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, black 72%, transparent) 0,
+      #000 var(--scroll-soft-top-size, var(--scroll-soft-size)),
+      #000 calc(100% - var(--scroll-soft-bottom-size, var(--scroll-soft-size))),
+      color-mix(in srgb, black 50%, transparent) 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, black 72%, transparent) 0,
+      #000 var(--scroll-soft-top-size, var(--scroll-soft-size)),
+      #000 calc(100% - var(--scroll-soft-bottom-size, var(--scroll-soft-size))),
+      color-mix(in srgb, black 72%, transparent) 100%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-animated {
+      background: var(--color-surface-2);
+      animation: none;
+    }
+    .agent-thinking-shimmer {
+      background-image: none;
+      color: var(--color-text-4);
+      -webkit-text-fill-color: currentColor;
+      animation: none;
+    }
+    .collapsible-animated,
+    .collapsible-animated[data-state='open'],
+    .collapsible-animated[data-state='closed'] {
+      transition: none;
+    }
+    .chat-item-enter {
+      transition: none;
+    }
+    .matrix-loader-dot {
+      animation: none;
+      opacity: 0.72;
+    }
+  }
+}
+
+/* scroll-fade — vendored from shadcn's utility (same copy as image-playground). */
+@property --scroll-fade-t {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-b {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-mask {
+  syntax: '*';
+  inherits: false;
+  initial-value: none;
+}
+
+@layer utilities {
+  @keyframes scroll-fade-reveal-t {
+    from {
+      --scroll-fade-t: 0px;
+    }
+    to {
+      --scroll-fade-t: var(--_scroll-fade-size-t, var(--scroll-fade-size, min(6%, calc(var(--spacing) * 5))));
+    }
+  }
+  @keyframes scroll-fade-reveal-b {
+    from {
+      --scroll-fade-b: var(--_scroll-fade-size-b, var(--scroll-fade-size, min(6%, calc(var(--spacing) * 5))));
+    }
+    to {
+      --scroll-fade-b: 0px;
+    }
+  }
+}
+
+@utility scroll-fade-y {
+  --_scroll-fade-size-t: var(--scroll-fade-t-size, var(--scroll-fade-size, min(6%, calc(var(--spacing) * 5))));
+  --_scroll-fade-size-b: var(--scroll-fade-b-size, var(--scroll-fade-size, min(6%, calc(var(--spacing) * 5))));
+  --scroll-fade-mask: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--scroll-fade-t, 0px),
+    #000 calc(100% - var(--scroll-fade-b, 0px)),
+    transparent 100%
+  );
+  -webkit-mask-image: var(--scroll-fade-mask);
+  mask-image: var(--scroll-fade-mask);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation:
+      scroll-fade-reveal-t 1ms ease-in-out,
+      scroll-fade-reveal-b 1ms ease-in-out;
+    animation-timeline: scroll(self block);
+    animation-range:
+      0 var(--scroll-fade-reveal, calc(var(--spacing) * 24)),
+      calc(100% - var(--scroll-fade-reveal, calc(var(--spacing) * 24))) 100%;
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-t: var(--_scroll-fade-size-t);
+    --scroll-fade-b: var(--_scroll-fade-size-b);
+  }
+}
+
+.scroll-fade-y:focus-within {
+  --scroll-fade-mask: none;
+}

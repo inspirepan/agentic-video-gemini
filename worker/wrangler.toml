@@ -1,0 +1,32 @@
+name = "agentic-video-gemini"
+main = "src/index.ts"
+compatibility_date = "2026-05-14"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+routes = [{ pattern = "agentic-video-gemini.youtu.uk", custom_domain = true }]
+
+[assets]
+directory = "../dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+[vars]
+# Runtime Gateway base URL. Requests go to `${GATEWAY_RUNTIME_URL}/gemini/v1beta/models/{MODEL_ID}:streamGenerateContent`.
+GATEWAY_RUNTIME_URL = "https://api.youtu.uk"
+MODEL_ID = "gemini-3.7-flash"
+# Comma separated. Empty = same-origin only.
+ALLOWED_ORIGINS = ""
+
+# Secrets (wrangler secret put / .dev.vars):
+#   GATEWAY_API_KEY  — dedicated `sk-…` key on the AI Gateway; all usage is attributed to it.
+
+# Per-IP request budget for the public, login-less endpoint.
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }
+
+[observability]
+enabled = true
+head_sampling_rate = 1

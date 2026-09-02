@@ -1,0 +1,92 @@
+@layer base {
+  /* The whole shell hangs off this percentage-height chain, so anything that
+     gives `body` an auto height silently collapses `#root` to nothing and the
+     viewport just shows the propagated `body` background. Vaul did exactly
+     that on Safari until we passed `noBodyStyles` (see ui/sheet.tsx). Audit any
+     new library that writes to `document.body.style`. */
+  html,
+  body,
+  #root {
+    margin: 0;
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  html {
+    /* iOS Safari otherwise inflates text size in narrow viewports, which breaks
+       fixed-width controls like the composer size chip ("4K · 2:3" overflows). */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    /* tnum is opt-in: add `tabular-nums` only on ratio / resolution / dimension UI. */
+    font-feature-settings: var(--font-sans--font-feature-settings);
+    font-variation-settings: var(--font-sans--font-variation-settings);
+    /* Keep emphasis visible without synthesizing fake weight. */
+    font-synthesis: style;
+    font-weight: var(--font-weight-normal);
+    font-size: var(--text-base);
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    overflow: hidden;
+  }
+
+  *:focus {
+    outline: none;
+  }
+  *:focus-visible {
+    outline: 1.5px solid var(--color-accent);
+    outline-offset: 1px;
+    border-radius: var(--radius-xs);
+  }
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: none;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+  textarea {
+    resize: none;
+  }
+  button {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Scrollbars: near-invisible, Linear-style */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+    border: 3px solid transparent;
+    border-radius: 100px;
+    background-clip: padding-box;
+  }
+  *:hover > ::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-thumb:hover,
+  *:hover::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-text) 18%, transparent);
+    background-clip: padding-box;
+  }
+}

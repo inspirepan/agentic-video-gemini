@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta id="theme-color" name="theme-color" content="#ffffff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="用任意公开 YouTube 视频对比 Gemini 3.7 Flash 的静态与 Agentic 视频理解。" />
+    <link rel="preload" href="/fonts/PaperMono[wght].woff2" as="font" type="font/woff2" crossorigin />
+    <title>Agentic Video · Gemini</title>
+    <script>
+      ;(function () {
+        try {
+          var root = document.documentElement
+          var theme = localStorage.getItem('agentic-video-theme')
+          var isDark =
+            theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          if (isDark) root.classList.add('dark')
+          root.style.colorScheme = isDark ? 'dark' : 'light'
+          document.getElementById('theme-color').setAttribute('content', isDark ? '#0b0b0b' : '#ffffff')
+        } catch (_) {}
+      })()
+    </script>
+    <style>
+      html {
+        color-scheme: light dark;
+        background: #ffffff;
+      }
+      html.dark {
+        background: #0b0b0b;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

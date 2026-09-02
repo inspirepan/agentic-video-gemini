@@ -1,0 +1,15 @@
+{
+  "name": "agentic-video-gemini-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8789",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260528.1",
+    "typescript": "~5.9.3",
+    "wrangler": "^4.50.0"
+  }
+}

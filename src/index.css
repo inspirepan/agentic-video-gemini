@@ -1,0 +1,7 @@
+@import 'tailwindcss';
+@import 'streamdown/styles.css';
+@import './styles/theme.css';
+@import './styles/base.css';
+@import './styles/utilities.css';
+
+@custom-variant dark (&:where(.dark, .dark *));

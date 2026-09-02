@@ -1,0 +1,3 @@
+# Copy to worker/.dev.vars for local development (git-ignored).
+GATEWAY_RUNTIME_URL=http://localhost:9787
+GATEWAY_API_KEY=sk-your-local-or-real-gateway-key

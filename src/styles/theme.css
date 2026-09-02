@@ -1,0 +1,593 @@
+@font-face {
+  font-family: 'Paper Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/PaperMono[wght].woff2') format('woff2-variations');
+}
+
+@theme {
+  --font-cjk-mono: ui-monospace, SFMono-Regular, 'SF Mono', monospace, -apple-system, BlinkMacSystemFont;
+  --font-sans: system-ui, sans-serif;
+  /* tnum is opt-in via `tabular-nums` — only ratio / resolution / dimension UI needs it. */
+  --font-sans--font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  --font-sans--font-variation-settings: normal;
+  --font-mono: 'Paper Mono', var(--font-cjk-mono);
+  --font-mono--font-feature-settings: 'liga' 0, 'calt' 0, 'tnum' 1, 'zero' 1, 'ss01' 1;
+  /* Display / section-heading font — same system sans as the body; headings
+     separate through size, weight (lighter, not heavier), tracking and tone,
+     never through a second sans. */
+  --font-display: system-ui, sans-serif;
+  --font-display--font-variation-settings: normal;
+  /* Brand wordmark — sidebar, mobile topbar and the login hero. The wordmark
+     is the UI's own system sans, semibold with tight tracking: no display
+     face, no italics — the brand voice is the restraint of the UI. 600 is
+     wordmark-only; every other tier stops at 500. */
+  --font-brand: system-ui, sans-serif;
+  --font-brand-weight: 600;
+  --font-brand-style: normal;
+
+  /* Swiss weight ladder: display tiers get lighter, not heavier. 300 is the
+     display / hero weight, 400 the body weight, 500 the emphasis ceiling.
+     Nothing in the UI goes above 500 except the brand wordmark (600). */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 500;
+  --font-weight-extrabold: 500;
+
+  /* Type scale — the standard Tailwind rungs (xs 12 / sm 14 / base 16 / lg 18 /
+     xl 20 / 2xl 24 / 3xl 30) with the project's own line-heights. Body text sits
+     one notch above the old compact scale, which read too small for a consumer
+     product. One custom rung survives below the standard scale:
+     --text-2xs (11px) for the .label caption tier. */
+  --text-2xs: 0.6875rem; /* 11px — caption / label tier; see .label, never uppercased */
+  --text-2xs--line-height: 1.4;
+  --text-xs: 0.75rem; /* 12px */
+  --text-xs--line-height: 1.35;
+  --text-sm: 0.875rem; /* 14px */
+  --text-sm--line-height: 1.4;
+  --text-base: 1rem; /* 16px */
+  --text-base--line-height: 1.45;
+  --text-lg: 1.125rem; /* 18px */
+  --text-lg--line-height: 1.35;
+  --text-xl: 1.25rem; /* 20px */
+  --text-xl--line-height: 1.35;
+  --text-2xl: 1.5rem; /* 24px */
+  --text-2xl--line-height: 1.2;
+  /* Hero tier — New Task intro and the login page. Set at font-light with
+     tight tracking: the hero earns presence from size and air, not weight. */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-3xl--line-height: 1.15;
+
+  /* ────────────────────────────────────────────────────────────────────
+     COLOR SYSTEM — near-neutral grays, cobalt accent, hard contrast.
+
+     TONE LADDER (--tone-50 → --tone-950): a near-neutral gray ramp. The page
+     rung is pure white — the gallery is the stage, so the page itself carries
+     no tint at all. The warm whisper (1–3 points of R over B) starts at
+     tone-100 and runs down the ramp, so recessed wells and text still feel
+     like paper stock rather than screen gray. The old Paper ladder carried a
+     visible yellow cast (#fcfbf9 / #f5f4f0 / #e0dfd5) which read as beige
+     admin chrome; keep any warm gray below that visibility line.
+
+     Contrast is deliberately harder than a typical tool UI, and every text
+     tier clears WCAG AA against both light surfaces. The quietest tier is the
+     binding constraint: tone-500 measures 5.34:1 on tone-50 and 4.73:1 on
+     tone-100 (bg-sunken), which is the one that matters since it is also the
+     placeholder color for every input. It was #757573 (4.42:1 / 4.09:1, under
+     the 4.5:1 floor) until it was darkened here. Anything quieter than tone-500
+     fails on bg-sunken — do not add one. Hierarchy comes from the ladder
+     position, never from hue.
+     ──────────────────────────────────────────────────────────────────── */
+  --tone-50: #ffffff;
+  --tone-100: #f1f1f0;
+  --tone-200: #e6e6e4;
+  --tone-300: #d8d8d6;
+  --tone-400: #b4b4b1;
+  --tone-500: #6b6b69;
+  --tone-600: #4f4f4d;
+  --tone-700: #3a3a39;
+  --tone-800: #262625;
+  --tone-900: #171716;
+  --tone-950: #0c0c0b;
+
+  /* Surfaces — tone ladder. Keep the page brighter than recessed wells so
+     sunken areas read as intentional depth in light mode. */
+  --color-bg: var(--tone-50);
+  --color-bg-sunken: var(--tone-100);
+  --color-surface: var(--tone-50);
+  --color-surface-2: var(--tone-100);
+  --color-surface-3: var(--tone-200);
+  /* Hover fill for rows resting directly on bg-sunken. surface-2 collapses into
+     the sunken base here (both tone-100) so it gives no feedback; this sits one
+     notch below the surface-3 selected fill so hover < active stays legible. */
+  --color-sunken-hover: color-mix(in srgb, var(--tone-200) 50%, var(--tone-100));
+  --agent-image-task-empty-bg: color-mix(in srgb, var(--color-surface-2) 72%, var(--color-surface));
+  --agent-thinking-text: color-mix(in srgb, var(--color-text-3) 76%, var(--color-bg));
+  /* Generating dot-spotlight field: dot colour at the centre of the light;
+     the cover fades it to nothing outside, so it stays well under text-3. */
+  --dot-spotlight-color: color-mix(in srgb, var(--color-text-3) 36%, transparent);
+  /* The field sits a touch lighter than surface-2 so a generating cell reads
+     as a soft paper, not a sunken well, next to finished media. */
+  --dot-spotlight-bg: color-mix(in srgb, var(--color-surface-2) 55%, var(--color-surface));
+
+  --color-border: var(--tone-300);
+  --color-border-strong: var(--tone-400);
+
+  --aspect-ratio-glyph: color-mix(in srgb, var(--color-text-3) 46%, var(--color-border-strong));
+
+  /* Text — tone ladder 500 → 950 */
+  --color-text: var(--tone-950);
+  --color-text-2: var(--tone-800);
+  --color-text-3: var(--tone-600);
+  --color-text-4: var(--tone-500);
+
+  /* Accent — Swiss cobalt. One accent for the whole product, expressed at
+     several strengths (fill / text / soft / wash / ring); never a second hue
+     to signal hierarchy. Cobalt #003B8E holds white CTA text at 10:1, so the
+     accent can carry both fill and text roles without a lighter sibling.
+     Hover goes lighter, not darker: on a fill this dark, a darker hover is
+     imperceptible. */
+  --color-accent: #003b8e;
+  --color-accent-hover: #084aa6;
+  --color-accent-fg: #ffffff;
+  --color-accent-text: #003b8e; /* on wash backgrounds */
+  --color-accent-soft: #dbe4f4;
+  --color-accent-wash: #eff3fa; /* sidebar selected, bubble bg */
+  --color-accent-wash-2: #e2eaf6; /* hover on wash */
+  --color-accent-ring: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  --color-accent-ring-hover: color-mix(in srgb, var(--color-accent) 34%, transparent);
+
+  /* Status colors — signal only, never decoration. Swiss red doubles as the
+     danger hue: with cobalt holding every accent role, red is unambiguous as
+     "something is wrong" and never competes for selection. Status must always
+     pair with text, icon or position — color alone is not a state.
+
+     Each status hue carries two tiers. The base is the fill / icon color; the
+     -text tier is what goes on a wash mixed from that same base. Using one
+     value for both roles cannot work: the wash is lightened by the very color
+     sitting on it, so the pair tops out around 2.6:1. Same split as
+     --color-accent / --color-accent-text. */
+  --color-warning: #da7700; /* amber-600, clamped into sRGB */
+  --color-warning-text: #a15600; /* 4.70:1 on the 14% warning wash */
+  --color-danger: #c8102e; /* Swiss red */
+  --color-danger-fg: #ffffff;
+  --color-danger-soft: #fbecee;
+  --color-success: #009669; /* emerald-600, clamped into sRGB */
+  --color-success-text: #007652; /* 4.77:1 on the 14% success wash */
+
+  /* Favorite star — a bright yellow tuned for the always-dark media overlay
+     chips. Marker semantics only; not a warning shade.
+
+     On media the star gets its separation from a drop-shadow, now applied to
+     both states (it used to be on the unfavorited state only, leaving the
+     filled yellow at ~1.15:1 on warm mid-tone images).
+
+     On light chrome it still measures 1.92:1 against --color-surface, below
+     the 3:1 non-text floor. Left as is deliberately: those call sites pair the
+     star with a label or a toggle position, and darkening the marker enough
+     for light chrome would muddy it on the dark media overlays where it scores
+     10.3:1 and does most of its work. */
+  --color-favorite: #eab308; /* yellow-500 */
+
+  /* Studio edge system: build borders with box-shadow, not physical borders.
+     Component elevation uses --shadow-1 through --shadow-5. The --edge-* and
+     --surface-edge* tokens are raw ingredients / compatibility aliases; new
+     component code should pick a numbered shadow or a state token.
+
+     Ladder (call-site contract — do not renumber without auditing consumers):
+       --shadow-1  quietest rim — accent-soft pills, badges (no top highlight;
+                   colored fills stay clean)
+       --shadow-2  filled control resting edge (inputs, outline buttons)
+       --shadow-3  outlined control resting (default Button, composer chips,
+                   attachment slots)
+       --shadow-4  hover lift / mid elevation (outlined hover, select open)
+       --shadow-5  floating panels (popover, dialog, composer dock)
+
+     Light depth = soft black rim + soft drop. A full white inset ring is
+     invisible on paper surfaces and dirty on accent washes, so light never
+     uses a perimeter inset in the numbered ladder; elevated steps (4/5) get a
+     directional top catch-light only. Floating steps (4/5) take a firmer 8%
+     rim than resting controls: a menu at 5% lying over a white header bar had
+     no edge of its own and merged with it, leaving only the drop to separate
+     the two. Dark depth is a different recipe — see .dark. */
+  --edge-line: color-mix(in srgb, black 5.5%, transparent);
+  --edge-line-soft: color-mix(in srgb, black 4.5%, transparent);
+  --edge-line-strong: color-mix(in srgb, black 8%, transparent);
+  /* Directional top catch-light (not a full perimeter inset). Composed into
+     elevated shadows; safe on colored fills because it only paints the top
+     edge. */
+  --edge-highlight: inset 0 1px 0 0 color-mix(in srgb, white 55%, transparent);
+  --edge-highlight-strong: inset 0 1px 0 0 color-mix(in srgb, white 70%, transparent);
+  /* Full-perimeter inset ring — reserved for frosted chrome / wells that
+     explicitly want an inner stroke. Not composed into --shadow-1…5. */
+  --edge-inset: inset 0 0 0 1px color-mix(in srgb, white 78%, transparent);
+  --edge-inset-strong: inset 0 0 0 1px color-mix(in srgb, white 90%, transparent);
+  /* Image edge — a dedicated pure-black/white hairline for photo content.
+     The faint --edge-line (4%) disappears against busy images; 10% opacity
+     gives every thumbnail consistent depth. Pure black/white (no tone hue)
+     so it never picks up the surface tint as dirt on the rim. */
+  --image-edge: color-mix(in srgb, black 10%, transparent);
+  --divider-line: var(--edge-line-soft);
+  --edge-shadow: 0 0 0 1px var(--edge-line);
+  --surface-edge: 0 0 0 1px var(--edge-line);
+  --surface-edge-hover: 0 0 0 1px color-mix(in srgb, black 7.5%, transparent);
+  --surface-edge-strong:
+    0 0 0 1px color-mix(in srgb, black 7%, transparent), 0 1px 2px -1px color-mix(in srgb, black 6%, transparent),
+    0 1px 3px 0 color-mix(in srgb, black 4%, transparent);
+  --shadow-1: 0 0 0 1px var(--edge-line-soft);
+  --shadow-2: var(--surface-edge);
+  --shadow-3: var(--surface-edge-strong);
+  --shadow-4:
+    var(--edge-highlight), 0 0 0 1px color-mix(in srgb, black 8%, transparent),
+    0 1px 2px -1px color-mix(in srgb, black 6%, transparent),
+    0 4px 14px -10px color-mix(in srgb, black 10%, transparent),
+    0 18px 44px -28px color-mix(in srgb, black 14%, transparent);
+  --shadow-5:
+    var(--edge-highlight), 0 0 0 1px color-mix(in srgb, black 8%, transparent),
+    0 3px 6px 0 color-mix(in srgb, black 5%, transparent), 0 4px 80px 8px color-mix(in srgb, black 6%, transparent);
+  --shadow-5-hover:
+    var(--edge-highlight-strong), 0 0 0 1px color-mix(in srgb, black 9%, transparent),
+    0 4px 10px 0 color-mix(in srgb, black 6%, transparent), 0 10px 92px 10px color-mix(in srgb, black 8%, transparent);
+
+  /* Filled CTA edge — outside the numbered ladder on purpose. The ladder builds
+     depth from a neutral rim (black in light, white in dark), and neither works
+     on a saturated fill: a black rim disappears into the cobalt, a white one
+     reads as dirt on it. A filled button instead casts a shadow tinted with its
+     own fill, so the accent button lands at the same resting elevation as the
+     outlined button beside it. Tight blur + negative spread keeps it a shadow
+     under the control, not a halo around it. */
+  --shadow-accent:
+    0 1px 2px -1px color-mix(in srgb, var(--color-accent) 40%, transparent),
+    0 2px 6px -2px color-mix(in srgb, var(--color-accent) 24%, transparent);
+  --shadow-accent-hover:
+    0 1px 2px -1px color-mix(in srgb, var(--color-accent) 48%, transparent),
+    0 4px 10px -3px color-mix(in srgb, var(--color-accent) 30%, transparent);
+
+  /* Wash-filled control edge — the edge for anything that gets its surface
+     from a fill rather than from elevation: wash buttons, rail toggles in
+     their "on" state, alerts, the queued-message card. Split by theme because
+     the two themes fail in opposite directions. Light: the fill already draws
+     the shape against paper, so the ladder's neutral rim lands as a gray ring
+     around a colored block; keep it at the quietest rim. Dark: a wash on
+     near-black has almost no edge of its own, and these controls sit right
+     beside outlined ones — without the top catch-light the filled one is the
+     single smudged tile in the row. Badges stay on --shadow-1 directly: at
+     11px a catch-light eats too much of the glyph height. */
+  --shadow-wash: var(--shadow-1);
+
+  /* Frosted-glass composer dock (New Task, floating over the gallery). The
+     fill stays solid enough to keep dark text legible; blur + saturate frost
+     the artwork behind. Elevation reuses --shadow-5 (same as the conversation
+     composer) — no separate glass shadow. */
+  --composer-glass-fill: color-mix(in srgb, var(--color-surface) 86%, transparent);
+  --composer-glass-sidebar-fill: color-mix(in srgb, var(--color-text) 4%, transparent);
+  /* Translucent stand-ins for surface-2/3 inside the glass dock so recessed
+     control fills (chip hover/active, mode-switch open, frame add-slots) read as
+     frosted glass. Text-based so they invert with the theme. */
+  --composer-glass-control: color-mix(in srgb, var(--color-text) 7%, transparent);
+  --composer-glass-control-active: color-mix(in srgb, var(--color-text) 12%, transparent);
+
+  /* Floating frosted chrome (toolbars, Zoom HUD, compare labels, video
+     controls, canvas chevrons): translucent surface + inset edge + soft drop.
+     Consume via TOOLBAR_CHROME_CLASS / --floating-chrome-*. Distinct from
+     --composer-glass-* (sticky header over scroll) and --media-overlay-*
+     (dark/light chips painted onto image pixels). */
+  --floating-chrome-bg: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  --floating-chrome-shadow:
+    var(--edge-highlight), inset 0 0 0 1px var(--edge-line-soft),
+    0 8px 22px -16px color-mix(in srgb, black 28%, transparent);
+
+  /* Compatibility aliases kept for existing Tailwind arbitrary var usage. */
+  --ring-edge: var(--edge-line);
+  --ring-edge-elevated: var(--edge-line-strong);
+  --ring-edge-strong: color-mix(in srgb, var(--color-text) 18%, transparent);
+  --ring-edge-soft: var(--edge-line-soft);
+
+  /* Media overlays sit on top of image content — use neutral-900-ish tints
+     instead of accent so they don't color-shift varied photos. Light variant
+     shares the floating-chrome fill so light chips and frosted capsules read
+     as one material; it does not carry the chrome drop shadow / blur recipe. */
+  --media-overlay-bg: color-mix(in srgb, oklch(20.5% 0 0) 58%, transparent); /* neutral-900 */
+  --media-overlay-bg-hover: color-mix(in srgb, oklch(20.5% 0 0) 74%, transparent);
+  --media-overlay-fg: oklch(98.5% 0 0); /* neutral-50 */
+  --media-overlay-edge: color-mix(in srgb, var(--media-overlay-fg) 16%, transparent);
+  --media-overlay-light-bg: var(--floating-chrome-bg);
+  --media-overlay-light-bg-hover: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  --media-overlay-light-fg: var(--color-text);
+  --media-overlay-light-edge: var(--edge-line);
+  --media-selection-ring: var(--color-accent);
+  --selection-edge-shadow:
+    0 0 0 2px color-mix(in srgb, var(--media-selection-ring) 76%, var(--color-text) 8%),
+    0 0 0 3px color-mix(in srgb, var(--color-bg-sunken) 94%, transparent),
+    0 2px 7px -4px color-mix(in srgb, var(--media-selection-ring) 34%, transparent);
+  --media-selection-ring-shadow: var(--selection-edge-shadow);
+  --modal-backdrop-bg: color-mix(in srgb, var(--color-bg-sunken) 38%, transparent);
+  --switch-thumb-bg: #ffffff;
+
+  /* transitions.dev motion scale used by the adopted shared recipes. The
+     project-specific easing aliases below preserve the established gallery
+     motion language. Add another scale rung with its first real use. */
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --ease-linear: linear;
+  --distance-small: 6px;
+  --scale-large: 0.96;
+  --scale-small: 0.98;
+
+  /* Easing curves — built-in CSS easings are too weak. These give animations
+     the punch that makes them feel intentional. Use --ease-out for any
+     enter/exit motion (most UI), --ease-in-out for on-screen movement, and
+     --ease-drawer for sheet-like, momentum-feeling motion. Never ease-in.
+     --ease-out is easeOutExpo: a fast initial move into a long, gentle glide
+     so things settle rather than snap-stop. --ease-in-out is easeInOutCubic,
+     a calmer S than the old Circ curve whose sharp mid-point read as a jolt
+     on cross-screen movement. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* transitions.dev recipes adapted to the existing Radix primitives. The
+     state hooks stay local to each primitive, while these names keep repeated
+     motion tunable without changing the established component timings. */
+  --dropdown-open-dur: 160ms;
+  --dropdown-close-dur: 120ms;
+  --dropdown-pre-scale: var(--scale-large);
+  --dropdown-closing-scale: var(--scale-large);
+  --dropdown-ease: var(--ease-out);
+  --modal-open-dur: 200ms;
+  --modal-close-dur: 140ms;
+  --modal-scale: var(--scale-large);
+  --modal-ease: var(--ease-out);
+  --icon-swap-dur: var(--duration-fast);
+  --icon-swap-blur: 4px;
+  --icon-swap-start-scale: 0.25;
+  --icon-swap-ease: var(--ease-out);
+  --tt-in-dur: var(--duration-quick);
+  --tt-out-dur: 50ms;
+  --tt-scale: var(--scale-small);
+  --tt-ease: var(--ease-out);
+  --acc-expand: 220ms;
+  --acc-collapse: 160ms;
+  --acc-ease: var(--ease-out);
+  --shimmer-dur: 1800ms;
+  --shake-distance: var(--distance-small);
+  --shake-duration: 320ms;
+  --shake-ease: var(--ease-out);
+  --digit-dur: 500ms;
+  --digit-distance: 8px;
+  --digit-stagger: 70ms;
+  --digit-blur: 2px;
+  --digit-ease: cubic-bezier(0.34, 1.45, 0.64, 1);
+  --dot-spotlight-cycle: 5000ms;
+  --dot-spotlight-ease: linear;
+  --matrix-cycle: 1200ms;
+  --matrix-ease: var(--ease-in-out);
+  --toggle-duration: 350ms;
+  --toggle-track-duration: 150ms;
+  --toggle-ease: cubic-bezier(0.34, 1.35, 0.64, 1);
+  --toggle-track-ease: var(--ease-out);
+
+  /* User-authored chat surfaces that are not the bubble itself (the answered
+     AskUserQuestion cards) — the accent wash, so they belong to the same cobalt
+     family as every other selected surface. The outgoing bubble and the queued
+     stack sit one step deeper on --color-accent-soft (see ui/bubble.tsx). */
+  --bubble-user-bg: var(--color-accent-wash);
+
+  /* Rectilinear radius scale. The Swiss style is built from rectangles: the
+     ladder is now 0/2/2/4/4/6 instead of 3/4/6/9/12/16, so controls read as
+     cut shapes and panels keep just enough softening to avoid a raw 90°
+     corner on a large surface. The concentric relationship survives — an
+     outer container still sits one step above its inner controls.
+
+     xs   0px  hairline glyphs, focus outline, inner-most chips
+     sm/md 2px inner controls, buttons, chips, thumbnails
+     lg/xl 4px panels, popovers, composer, image previews
+     2xl   6px dialogs and other full-page surfaces
+     pill      geometric exceptions only (see DESIGN.md) */
+  --radius-xs: 0px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 6px;
+  --radius-pill: 999px;
+
+  /* Focus ring — single neutral 2px halo, used by every interactive primitive.
+     Control heights live as Tailwind utilities (h-7/h-8/h-9) inside Button /
+     Input / Select variants — no separate height token to avoid two sources. */
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px color-mix(in srgb, var(--color-accent) 56%, transparent);
+
+  /* Panel layout tokens — set on the layout root (MobileLayout / DesktopLayout)
+     for each of the six panel layouts. Inner panel components read these
+     instead of branching on inputMode. The fallbacks below assume a desktop
+     generate panel; layout roots override per layout. */
+  --panel-pad-x: 18px;
+  --panel-pad-top: 18px;
+  --panel-pad-bottom: 18px;
+  --panel-header-pad-x: var(--panel-pad-x);
+  --panel-header-mb: 18px;
+
+  /* Agent transcript rails. Every row is two columns: an icon gutter of this
+     width, then the content column. Blocks with no icon (message text, cards,
+     the session title) start at the content column, so one left edge runs down
+     the whole transcript and the icons hang in their own column beside it.
+     22px = the 14px row icon plus the 8px gap after it. One nesting level (the
+     rows inside a code run) shifts by exactly one gutter. */
+  --agent-row-gutter: 22px;
+}
+
+/* Dark theme — neutral ink surfaces, near-white text, cobalt accent. The old
+   Ayu palette tinted every surface blue-green and capped body text at #b3b1ad,
+   which flattened the whole dark UI into low-contrast gray. Surfaces are now
+   neutral black and text runs up to #f5f5f4, so the two themes are equally
+   hard-contrast mirrors rather than one crisp and one muted. */
+.dark {
+  --color-bg: #0b0b0b;
+  --color-bg-sunken: #050505;
+  --color-surface: #131313;
+  --color-surface-2: #1b1b1b;
+  --color-surface-3: #272727;
+  --color-sunken-hover: #161616;
+  --agent-image-task-empty-bg: color-mix(in srgb, var(--color-surface-2) 70%, var(--color-surface));
+  /* Quiet-tier dilution ratio is theme-specific: the same "text-3 toward bg"
+     step costs far more Lc in the dark polarity, so dark dilutes less (90%)
+     to land near the light rung (Lc ≈ 67 vs light ≈ 70). */
+  --agent-thinking-text: color-mix(in srgb, var(--color-text-3) 90%, var(--color-bg));
+  /* Light-on-dark reads brighter at the same mix, so the dark field mixes less. */
+  --dot-spotlight-color: color-mix(in srgb, var(--color-text-3) 30%, transparent);
+  --dot-spotlight-bg: color-mix(in srgb, var(--color-surface-2) 55%, var(--color-surface));
+
+  --color-border: #272727;
+  --color-border-strong: #3a3a3a;
+
+  /* Same parity rule as --agent-thinking-text: 80% in dark ≈ light's 46% (Lc ≈ 61, light ≈ 64). */
+  --aspect-ratio-glyph: color-mix(in srgb, var(--color-text-3) 80%, var(--color-border-strong));
+
+  /* Text rungs are re-leveled to per-rung APCA parity with the light ladder,
+     not a simple inversion. Light-on-dark at the same WCAG ratio reads
+     thinner, so matching the light rungs' measured Lc takes much lighter
+     values: text-2 102.1→91, text-3 88.4→79, text-4 76.6→66 (the quiet floor;
+     APCA's Lc 60 body minimum + margin). The light references moved up ~3 Lc
+     when tone-50 went pure white; the dark rungs keep their tuned values.
+     The 2-point warm cast of the light
+     rungs is kept so both themes share the same paper stock. */
+  --color-text: #f5f5f4;
+  --color-text-2: #e6e6e4;
+  --color-text-3: #d2d2d0;
+  --color-text-4: #bcbcba;
+
+  /* Cobalt, lifted for dark surfaces. #003b8e is unreadable on black, so the
+     dark theme keeps the same hue at high lightness and flips the CTA text to
+     the page ink — the same inversion the light theme performs, mirrored. */
+  --color-accent: #7fa6f2;
+  --color-accent-hover: #98baf7;
+  --color-accent-fg: #0b0b0b;
+  --color-accent-text: #b0c9f9;
+  --color-accent-soft: #1d2739;
+  --color-accent-wash: #151d2b;
+  --color-accent-wash-2: #1d2739;
+  --color-accent-ring: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  --color-accent-ring-hover: color-mix(in srgb, var(--color-accent) 34%, transparent);
+
+  /* Status hues lifted for neutral black surfaces. Swiss red reads as maroon
+     against #0b0b0b, so danger keeps the hue at higher lightness; warning and
+     success stay muted enough not to fight the cobalt accent. All three were
+     re-leveled with the ink ladder to Lc ≈ 55–66 as text (they sat 15–33 Lc
+     below their light counterparts before). */
+  --color-warning: #e5b271;
+  /* Dark needs no separate text tier: a light hue on a wash mixed from itself
+     over a near-black surface measures 8.3:1 (warning) and 8.4:1 (success).
+     Kept as tokens so call sites stay theme-agnostic. */
+  --color-warning-text: #e5b271;
+  --color-danger: #f6888f;
+  --color-danger-fg: #0b0b0b;
+  --color-danger-soft: #2c1517;
+  --color-success: #7fcca5;
+  --color-success-text: #7fcca5;
+
+  /* Favorite star (marker, not a warning). */
+  --color-favorite: #f5b64a;
+
+  /* Dark depth is not a mirror of light. Black drop shadows vanish on near-
+     black surfaces, and a hard white rim reads as a hairline stroke — so the
+     ladder uses a soft white rim (≈5.5–10%, never 18%) plus a directional top
+     catch-light. --shadow-1 stays rim-only so accent/danger washes stay clean.
+     Floating steps keep a soft rim (outlined hover used to lose its edge when
+     --shadow-4 was drop-only). */
+  --edge-line: color-mix(in srgb, white 7.5%, transparent);
+  --edge-line-soft: color-mix(in srgb, white 5.5%, transparent);
+  --edge-line-strong: color-mix(in srgb, white 10%, transparent);
+  --edge-highlight: inset 0 1px 0 0 color-mix(in srgb, white 10%, transparent);
+  --edge-highlight-strong: inset 0 1px 0 0 color-mix(in srgb, white 14%, transparent);
+  /* Recessed well stroke (sunken inputs) — opposite of --edge-highlight. */
+  --edge-inset: inset 0 0 0 1px color-mix(in srgb, black 32%, transparent);
+  --edge-inset-strong: inset 0 0 0 1px color-mix(in srgb, black 42%, transparent);
+  /* Image edge (dark) — pure white, a touch firmer than --edge-line so photos
+     keep a clean rim against the dark surface. See light theme note. */
+  --image-edge: color-mix(in srgb, white 10%, transparent);
+  --divider-line: var(--edge-line-soft);
+  --edge-shadow: 0 0 0 1px var(--edge-line);
+  --surface-edge: var(--edge-highlight), 0 0 0 1px var(--edge-line);
+  --surface-edge-hover: var(--edge-highlight-strong), 0 0 0 1px var(--edge-line-strong);
+  --surface-edge-strong: var(--edge-highlight-strong), 0 0 0 1px color-mix(in srgb, white 10%, transparent);
+  --shadow-1: 0 0 0 1px var(--edge-line-soft);
+  --shadow-2: var(--surface-edge);
+  --shadow-3: var(--surface-edge-strong);
+  --shadow-4:
+    var(--edge-highlight-strong), 0 0 0 1px color-mix(in srgb, white 10%, transparent),
+    0 4px 14px -10px color-mix(in srgb, black 55%, transparent),
+    0 18px 44px -28px color-mix(in srgb, black 45%, transparent);
+  --shadow-5:
+    var(--edge-highlight), 0 0 0 1px color-mix(in srgb, white 8%, transparent),
+    0 3px 6px 0 color-mix(in srgb, black 44%, transparent), 0 4px 80px 8px color-mix(in srgb, black 38%, transparent);
+  --shadow-5-hover:
+    var(--edge-highlight-strong), 0 0 0 1px color-mix(in srgb, white 10%, transparent),
+    0 4px 10px 0 color-mix(in srgb, black 50%, transparent), 0 10px 92px 10px color-mix(in srgb, black 44%, transparent);
+
+  /* Filled CTA edge — dark. Not the light recipe with different numbers: a
+     bright fill on a near-black canvas has nothing to cast onto, so a drop
+     reads as nothing and a tinted one reads as a halo stuck to the button.
+     Depth here comes from the same place as the rest of the dark ladder — the
+     top catch-light — just at a higher alpha, since the ladder's 10–14% white
+     vanishes on a fill this bright. It stays 1px: the catch-light is a lit
+     edge, and at 2px it stops reading as an edge and starts reading as a
+     plastic strip laid on the button, with the 2px corner radius clipping
+     visible notches out of both ends. No white rim either — the saturated fill
+     already draws its own edge against the canvas, and ringing it would fur
+     the outline. The short black drop grounds the button on lifted surfaces
+     (dialogs, popovers, composer dock). */
+  --shadow-accent:
+    inset 0 1px 0 0 color-mix(in srgb, white 22%, transparent), 0 1px 2px 0 color-mix(in srgb, black 55%, transparent);
+  --shadow-accent-hover:
+    inset 0 1px 0 0 color-mix(in srgb, white 28%, transparent), 0 1px 3px 0 color-mix(in srgb, black 60%, transparent);
+
+  /* Wash button edge — dark half of the split; see the light-theme note. */
+  --shadow-wash: var(--shadow-3);
+
+  /* Frosted-glass composer dock — dark theme. Elevation reuses --shadow-5
+     (same as the conversation composer); only the frosted fill differs. */
+  --composer-glass-fill: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  --composer-glass-sidebar-fill: color-mix(in srgb, var(--color-text) 4%, transparent);
+  /* Dark frost needs a touch more lift to read as a control state. */
+  --composer-glass-control: color-mix(in srgb, var(--color-text) 10%, transparent);
+  --composer-glass-control-active: color-mix(in srgb, var(--color-text) 16%, transparent);
+
+  /* Floating chrome — dark: top catch-light + soft rim + deeper drop so
+     capsules still separate from dark canvas without a hard hairline. */
+  --floating-chrome-bg: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  --floating-chrome-shadow:
+    var(--edge-highlight), inset 0 0 0 1px var(--edge-line-soft),
+    0 8px 22px -16px color-mix(in srgb, black 48%, transparent);
+
+  --ring-edge: var(--edge-line);
+  --ring-edge-elevated: var(--edge-line-strong);
+  --ring-edge-strong: color-mix(in srgb, var(--color-text) 24%, transparent);
+  --ring-edge-soft: var(--edge-line-soft);
+
+  --media-overlay-bg: color-mix(in srgb, #000000 72%, transparent);
+  --media-overlay-bg-hover: color-mix(in srgb, #000000 86%, transparent);
+  --media-overlay-fg: oklch(98.5% 0 0); /* neutral-50 */
+  --media-overlay-edge: color-mix(in srgb, var(--media-overlay-fg) 16%, transparent);
+  /* Light-on-media chips stay pale in dark theme so they read on dark photos;
+     floating chrome stays surface-tinted (above). Do not alias these two. */
+  --media-overlay-light-bg: color-mix(in srgb, oklch(98.5% 0 0) 88%, transparent);
+  --media-overlay-light-bg-hover: color-mix(in srgb, #ffffff 94%, transparent);
+  --media-overlay-light-fg: oklch(20.5% 0 0); /* neutral-900 */
+  --media-overlay-light-edge: color-mix(in srgb, #ffffff 28%, transparent);
+  --media-selection-ring: var(--color-accent);
+  --selection-edge-shadow:
+    0 0 0 2px color-mix(in srgb, var(--media-selection-ring) 68%, var(--color-text) 8%),
+    0 0 0 3px color-mix(in srgb, var(--color-bg-sunken) 96%, transparent),
+    0 2px 8px -4px color-mix(in srgb, var(--media-selection-ring) 42%, transparent);
+  --media-selection-ring-shadow: var(--selection-edge-shadow);
+  --modal-backdrop-bg: color-mix(in srgb, #000000 74%, transparent);
+  --switch-thumb-bg: #e8e8e6;
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px color-mix(in srgb, var(--color-accent) 64%, transparent);
+
+  /* Chat user bubble uses the dark cobalt wash. */
+  --bubble-user-bg: var(--color-accent-wash);
+
+  color-scheme: dark;
+}
